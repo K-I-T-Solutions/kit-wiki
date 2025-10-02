@@ -13,11 +13,11 @@ export default defineConfig({
 			dark: './src/assets/KIT_IT_WHITE_NO_BACKGROUND.png',
 		  },
           title: 'K.I.T. Wiki',
-          social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/commanderphu/kit-wiki' },
+          social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/K-I-T-Solutions/kit-wiki' },
 		  { icon: 'discord', label: 'Discord', href: 'https://discord.gg/wPe98Kru3C' }
 		  ],
 		  editLink: {
-			baseUrl: '',}, // Add your edit link base URL here
+			baseUrl: 'https://github.com/K-I-T-Solutions/kit-wiki/edit/master/',}, // Add your edit link base URL here
           sidebar: [
               {
                   label: 'Guides',
