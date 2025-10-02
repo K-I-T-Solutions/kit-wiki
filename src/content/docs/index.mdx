@@ -1,8 +1,40 @@
 ---
-title: Wiki-Startseite 
+title: Willkommen bei K.I.T. Solutions
+description: Dein IT-Wiki für Support, Dokumentation und Anleitungen.
 template: splash
-description: Dies ist die Wiki Startseite
 hero:
-  title: 'Wiki-Startseite '
-  tagline: Wiki-Startseite .
+  tagline: IT muss nicht schmutzig sein.  
+  image:
+    file: ../../assets/KIT_IT_WHITE_NO_BACKGROUND.png
+    alt: K.I.T. Solutions Logo
+  actions:
+    - text: 📘 Anleitungen
+      link: /guides/
+      icon: right-arrow
+    - text: 🔧 Tools & Links
+      link: /tools/
+      icon: setting
+    - text: 🌐 K.I.T. Solutions Website
+      link: https://kit-it-koblenz.de
+      icon: external
+      variant: minimal
 ---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Schnellzugriff
+
+<CardGrid stagger>
+  <Card title="📂 Dokumentation" href="/docs/" icon="open-book">
+    Zentrale Wissensbasis für alle Themen rund um K.I.T. Solutions.
+  </Card>
+  <Card title="⚡ Troubleshooting" href="/troubleshooting/" icon="rocket">
+    Schnelle Hilfe bei häufigen Problemen.
+  </Card>
+  <Card title="🛠️ Setup & Services" href="/services/" icon="add-document">
+    Infos zu unseren IT-Services und internen Setups.
+  </Card>
+  <Card title="🤝 Kontakt & Support" href="/support/" icon="pencil">
+    Direkt Hilfe anfordern oder Kontakt aufnehmen.
+  </Card>
+</CardGrid>
