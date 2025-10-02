@@ -3,8 +3,12 @@ title: Onboarding – Kurz & knackig
 description: Die ersten 15–30 Minuten.
 ---
 
-1) **Firmen-E-Mail aktivieren** (Webmail)  
-2) **Passwort ändern & 2FA** (TOTP-App)  
-3) **Discord beitreten** (Team-Server)  
-4) **Mail-Client** einrichten (IMAP/SMTP)  
-5) **Wichtige Links** in Lesezeichen speichern → [/tools/](/tools/)
+import { Steps, LinkButton } from '@astrojs/starlight/components';
+
+<Steps>
+1.  **Firmen-E-Mail aktivieren** (Webmail) <LinkButton href="/tools/webmail/" variant="minimal">  =>  *Webmail* </LinkButton>
+2.  **Passwort ändern & 2FA** (TOTP-App) => Anleitung kommt
+3.  **Discord beitreten** (Team-Server)  ==>  <LinkButton href="/tools/discord/" icon="discord" variant="minimal">   </LinkButton>
+4.  **Mail-Client** einrichten (IMAP/SMTP) <LinkButton href="/tools/mail-setup/" variant="minimal">  =>  *Email-Setup* </LinkButton>
+5.  **Wichtige Links** in Lesezeichen speichern → [/tools/](/tools/)
+</Steps>

@@ -19,3 +19,11 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+/out/
+/node_modules/
+/.venv/
+__pycache__/
+roles.json
+channels.json
+EOF

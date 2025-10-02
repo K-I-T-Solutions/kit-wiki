@@ -1,0 +1,44 @@
+---
+title: Troubleshooting – schnelle Hilfe
+description: 6 häufige Probleme, kurz gelöst.
+---
+
+## 1) E-Mails kommen nicht an / gehen nicht raus
+- Prüfe **Online/IMAP/SMTP**: Flugmodus aus, Internet aktiv.
+- IMAP: Port **993**, **SSL/TLS** · SMTP: Port **587**, **STARTTLS**.
+- Nutzername = **volle E-Mail-Adresse**. 2FA? → **App-Passwort** nutzen.
+- Spam/Quarantäne prüfen. Große Anhänge (< 20 MB) oder Cloud-Link senden.
+- Test: an eigene Adresse mailen, in **Gesendet** prüfen.
+
+## 2) Webmail Login schlägt fehl
+- Richtige Domain? (Firmen-Webmail-URL)
+- **Passwort sichtbar tippen** (neues Tab: `about:blank`, dann kopieren).
+- **Tastaturlayout** prüfen (DE/EN), **Caps Lock** aus.
+- 2FA-App: korrekte Zeit synchronisiert? (Automatisch/Zeitserver)
+- Zur Not: „Passwort vergessen“ → Recovery/Helpdesk.
+
+## 3) Discord: kein Ton / Mic geht nicht
+- In Discord **Einstellungen → Sprache & Video**:
+  - Ein-/Ausgangsgerät korrekt?
+  - „Eingangsmodus: Sprachaktivierung“ testweise statt Push-to-Talk.
+- OS-Audio prüfen (richtiger Output), Lautstärke ≠ 0, Mic nicht gemutet.
+- Browser-Discord? → **App** testen (oder umgekehrt).
+- Linux: `pavucontrol` öffnen, App/Device zuordnen.
+
+## 4) DNS/Seiten laden langsam oder gar nicht
+- Test: `nslookup wiki.kit-it-koblenz.de` / `ping -c 1 host`.
+- DNS ändern (temporär): 1.1.1.1 / 9.9.9.9 / 8.8.8.8.
+- Browser-Cache leeren / anderen Browser testen.
+- VPN aktiv? → kurz trennen und nochmal testen.
+
+## 5) VPN verbindet nicht
+- Anmeldedaten/2FA korrekt? Uhrzeit des Geräts korrekt?
+- Prüfe Netz: Gäste-WLAN oder Mobil-Hotspot blockiert ggf. VPN.
+- Firewall/AV temporär testen (deaktivieren → Test → wieder aktivieren).
+- Event-Log/Client-Log kopieren → an Admin/Support.
+
+## 6) Drucker druckt nicht
+- Gerät online? Papier/Toner? Stau entfernen.
+- Richtigen **Queue/Modelltreiber** gewählt?
+- Testseite lokal drucken; wenn ok → App/Datei-Problem.
+- Netzwerkdrucker: IP erreichbar? (Ping), ggf. neu verbinden.

@@ -1,0 +1,142 @@
+---
+import data from "../data/discord/discord_export.json";
+
+/** Types (nur für Editor-Hilfe) */
+type Channel = {
+  id: string | number;
+  name: string;
+  type: string | number;
+  parent_id?: string | number | null;
+  position?: number | null;
+  topic?: string | null;
+  nsfw?: boolean | null;
+  rate_limit_per_user?: number | null;  // Node-Export
+  slowmode_delay?: number | null;       // Python-Export
+};
+
+/** Utils */
+const typeStr = (t: Channel["type"]) =>
+  (typeof t === "string" ? t.toLowerCase() : String(t));
+const isCategory = (c: Channel) => {
+  const t = typeStr(c.type);
+  return t === "category" || t.includes("category") || t === "4";
+};
+const byPosThenName = (a: Channel, b: Channel) =>
+  (a.position ?? 0) - (b.position ?? 0) ||
+  String(a.name).localeCompare(String(b.name));
+
+const typeLabel = (t: Channel["type"]) =>
+  typeStr(t).replace(/^guild_/, "").replace(/_/g, " ");
+
+/** Name normalisieren: Emoji/Separator „・“ abschneiden, Kleinbuchstaben */
+const baseName = (name: string) => {
+  let n = name.trim();
+  if (n.includes("・")) n = n.split("・").pop()!.trim();
+  if (n.startsWith("#")) n = n.slice(1).trim();
+  return n.toLowerCase();
+};
+
+/** Nerdige K.I.T.-Beschreibungen (Overrides) */
+const DESCRIPTIONS: Record<string, string> = {
+  "start-here": "Onboarding & Schnellstart: wie wir Discord, Workmate & Wiki nutzen. TL;DR für Neuzugänge.",
+  "ankündigungen": "Offizielle Ansagen zu Releases, Wartungen, Terminen. Read-only; Diskussion im Thread.",
+  "rollen": "Rollen-Übersicht & Self-Assign (Reaction-Roles). Wofür steht was? Rechte & Sichtbarkeiten.",
+  "team-chat": "Kurzfragen, schnelle Abstimmung, tägliche Orga. Low-latency, bitte Threads für Themen.",
+  "wichtige-links": "Zentrale Sprungbrett-Links: Wiki, Workmate, Webmail, Nextcloud, Policies, Status-Page.",
+  "termine-deadlines": "Team-Kalender, Sprints & Abgaben. ICS/CalDAV im Wiki verlinkt, Reminder willkommen.",
+  "quick-notes": "Zettelbox für flüchtige Ideen & TODO-Schnipsel. Später ins Aufgaben-Board migrieren.",
+  "hacks": "Praxis-Snippets & Workarounds (Homelab/Support). Mini-How-Tos bevor es ins Wiki geht.",
+  "social-media": "Content-Plan & Assets (TravelTune/K.I.T.). Ideen, Captions, Redaktionskalender.",
+  "vertrieb": "Leads, Angebote, CRM-Notizen, Pitches. Templates & kurze Playbooks.",
+  "katastrophenhilfe": "Incident-Response: Störung, On-Call, Status, Post-Mortems. Runbooks/Checklisten first.",
+  "aufgaben-board": "Aufgaben/Tickets: Backlog → In Progress → Done. Verantwortliche & Fälligkeiten rein.",
+  "meeting-notes": "Protokolle & Beschlüsse. Pro Meeting ein Thread mit Action-Items.",
+  "dokumentation": "Drafts für Guides/How-Tos, die später ins Wiki wandern. Bitte strukturiert schreiben.",
+  "standup": "Daily-Standup: Gestern/Heute/Blocker. Ein Thread pro Tag, kurz & knackig.",
+  "team-meeting": "Agenda-Sammelstelle & Vorbereitung. Fragen/Topics vorab posten.",
+  "kaffee-lounge": "Off-Topic & Team-Kultur: Pausen-Talk, Memes, kleine Wins ☕.",
+};
+
+/** Fallback-Beschreibung, falls kein Override passt */
+const fallbackDesc = (ch: Channel) => {
+  const t = typeLabel(ch.type);
+  const tt = ch.topic ? ` Thema: ${ch.topic}` : "";
+  return `Allgemeiner ${t}-Kanal für teaminterne Abstimmung.${tt}`;
+};
+
+/** Hinweise automatisch ableiten */
+const hintsFor = (ch: Channel) => {
+  const t = typeStr(ch.type);
+  const name = baseName(ch.name);
+
+  const hints: string[] = [];
+  // Read-only Indizien
+  if (t.includes("announcement") || /ankünd/i.test(name)) hints.push("read-only (Teamleitung/Mods)");
+  // Forum/Threads
+  if (t.includes("forum")) hints.push("Forum: ein Thread pro Thema");
+  if (t.includes("news")) hints.push("News-Kanal (followable)");
+  // Slowmode
+  const slow = ch.rate_limit_per_user ?? ch.slowmode_delay;
+  if (typeof slow === "number" && slow > 0) hints.push(`Slowmode ${slow}s`);
+  // NSFW
+  if (ch.nsfw) hints.push("NSFW");
+
+  return hints.join(" • ");
+};
+
+/** Daten aufbereiten */
+const channels = (data as any).channels as Channel[];
+
+const cats = channels.filter(isCategory);
+const catNameById = new Map<string | number, string>();
+for (const c of cats) catNameById.set(c.id, c.name);
+
+const onlyChannels = channels.filter((c) => !isCategory(c));
+
+/** Sortierung: Kategorie-Name, Position */
+const sorted = [...onlyChannels].sort((a, b) => {
+  const ca = catNameById.get(a.parent_id ?? "") ?? "Ohne Kategorie";
+  const cb = catNameById.get(b.parent_id ?? "") ?? "Ohne Kategorie";
+  return ca.localeCompare(cb) || byPosThenName(a, b);
+});
+---
+
+<style>
+  table.dk-table { width: 100%; border-collapse: collapse; }
+  .dk-table th, .dk-table td { border-bottom: 1px solid var(--sl-color-gray-5, #e5e7eb); padding: .5rem .75rem; vertical-align: top; }
+  .dk-badge { display: inline-block; padding: .125rem .375rem; border: 1px solid var(--sl-color-gray-5, #e5e7eb); border-radius: .375rem; font-size: .75rem; line-height: 1; }
+  .muted { opacity: .7; font-size: .9em; }
+</style>
+
+<div class="not-prose">
+  <h2 class="text-xl font-semibold mb-3">Kanäle – Übersicht (K.I.T. intern)</h2>
+
+  <table class="dk-table">
+    <thead>
+      <tr>
+        <th style="width:22%">Kanal</th>
+        <th style="width:36%">Beschreibung</th>
+        <th style="width:12%">Hinweise</th>
+      </tr>
+    </thead>
+    <tbody>
+      {sorted.map((ch) => {
+        const key = baseName(ch.name);
+        const desc = DESCRIPTIONS[key] ?? fallbackDesc(ch);
+        const hint = hintsFor(ch);
+        return (
+          <tr>
+
+            <td><code>#{ch.name}</code></td>
+            <td>{desc}</td>
+            <td class="muted">{hint || "—"}</td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+
+  <p class="muted" style="margin-top:.75rem">
+    Tipp: Beschreibungen erweiterst du im <code>DESCRIPTIONS</code>-Block in <code>DiscordChannelTable.astro</code>.
+  </p>
+</div>

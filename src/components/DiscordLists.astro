@@ -1,0 +1,65 @@
+---
+import data from "../data/discord/discord_export.json";
+
+type Channel = {
+  id: string | number;
+  name: string;
+  type: string | number;
+  parent_id?: string | number | null;
+  position?: number | null;
+  topic?: string | null;
+};
+type Role = {
+  id: string | number;
+  name: string;
+  position: number;
+  managed?: boolean;
+  hoist?: boolean;
+  mentionable?: boolean;
+};
+
+const channels = (data as any).channels as Channel[];
+const roles = (data as any).roles as Role[];
+
+const typeStr = (t: Channel["type"]) => (typeof t === "string" ? t.toLowerCase() : String(t));
+const isCategory = (c: Channel) => {
+  const t = typeStr(c.type);
+  return t === "category" || t.includes("category") || t === "4";
+};
+const byPosThenName = (a: Channel, b: Channel) =>
+  (a.position ?? 0) - (b.position ?? 0) || String(a.name).localeCompare(String(b.name));
+const typeLabel = (t: Channel["type"]) => typeStr(t).replace(/^guild_/, "").replace(/_/g, " ");
+
+const categories = channels.filter(isCategory).sort(byPosThenName);
+const childrenOf = (pid: Channel["parent_id"]) =>
+  channels.filter((ch) => (ch.parent_id ?? null) === pid && !isCategory(ch)).sort(byPosThenName);
+const uncategorized = channels
+  .filter((ch) => ch.parent_id == null && !isCategory(ch))
+  .sort(byPosThenName);
+---
+
+<div class="not-prose">
+  <h2 class="text-xl font-semibold mb-2">Rollen (Top → Bottom)</h2>
+  <ul class="mb-6">
+    {roles.slice().sort((a, b) => b.position - a.position).map((r) => (
+      <li>
+        <strong>{r.name}</strong> (pos {r.position})
+        {r.managed ? " 🛠" : ""}{r.hoist ? " 📌" : ""}{r.mentionable ? " 🔔" : ""}
+      </li>
+    ))}
+  </ul>
+<h2 class="text-xl font-semibold mb-2">Kanäle</h2>
+  {categories.map((cat) => (
+    <div class="mb-4">
+      <ul class="ml-4 list-disc">
+        {childrenOf(cat.id).map((ch) => (
+          <li>
+            #{ch.name} {ch.topic ? ` — ${ch.topic}` : ""}
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+
+
+</div>
