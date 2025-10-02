@@ -21,42 +21,45 @@ export default defineConfig({
 		  ],
 		  editLink: {
 			baseUrl: 'https://github.com/K-I-T-Solutions/kit-wiki/edit/master/',}, // Add your edit link base URL here
-        sidebar: [
+              sidebar: [
+        { label: 'Start', items: [{ label: 'Übersicht', link: '/docs/' }] },
+
         {
-          label: 'Start',
+          label: 'Onboarding',
           items: [
-            { label: 'Willkommen', link: '/docs/' },
+            { label: 'Kurz & knackig', link: '/onboarding/' },
+            { label: 'Zugänge & Sicherheit', link: '/onboarding/access/' },
+            { label: 'Zero Trust (später)', link: '/onboarding/zero-trust/' }, // Platzhalter
           ],
         },
+
         {
-          label: 'Guides',
+          label: 'Tools',
           items: [
-            { label: 'Erste Schritte', link: '/guides/' },
-            { label: 'How-Tos', link: '/guides/how-tos/' },
+            { label: 'Dashboard', link: '/tools/' },
+            { label: 'Webmail', link: '/tools/webmail/' },
+            { label: 'E-Mail-Setup', link: '/tools/mail-setup/' },
+            { label: 'Discord', link: '/tools/discord/' },
+            { label: 'Workmate (bald)', link: '/tools/workmate/' },
           ],
         },
+
         {
-          label: 'Tools & Links',
+          label: 'Nerdy Things',
           items: [
-            { label: 'Übersicht', link: '/tools/' },
-            { label: 'Interne Links', link: '/tools/internal/' },
-            { label: 'Externe Links', link: '/tools/external/' },
+            { label: 'CLI & Snippets', link: '/nerdy/cli/' },
+            { label: 'SSH & Keys', link: '/nerdy/ssh/' },
           ],
         },
+
         {
-          label: 'Services',
+          label: 'Cheatsheets',
           items: [
-            { label: 'Unsere Services', link: '/services/' },
-            { label: 'Setup & Infrastruktur', link: '/services/setup/' },
+            { label: 'Abkürzungen & Terms (A–Z)', link: '/cheatsheets/abkuerzungen/' },
           ],
         },
-        {
-          label: 'Support',
-          items: [
-            { label: 'Kontakt & Ticket', link: '/support/' },
-            { label: 'Troubleshooting', link: '/troubleshooting/' },
-          ],
-        },
+
+        { label: 'Troubleshooting', items: [{ label: 'Häufige Probleme', link: '/troubleshooting/faq' }] },
       ],
 	  lastUpdated: true,
 	  customCss: ['./src/styles/global.css'],
