@@ -1,14 +1,247 @@
 ---
-title: Onboarding – Kurz & knackig
-description: Die ersten 15–30 Minuten.
+title: Willkommen bei K.I.T. Solutions!
+description: Dein Onboarding-Guide für einen erfolgreichen Start im Team.
 ---
 
-import { Steps, LinkButton } from '@astrojs/starlight/components';
+import { Card, CardGrid, LinkCard, Aside, Badge } from '@astrojs/starlight/components';
 
-<Steps>
-1.  **Firmen-E-Mail aktivieren** (Webmail) <LinkButton href="/tools/webmail/" variant="minimal">  =>  *Webmail* </LinkButton>
-2.  **Passwort ändern & 2FA** (TOTP-App) => Anleitung kommt
-3.  **Discord beitreten** (Team-Server)  ==>  <LinkButton href="/tools/discord/" icon="discord" variant="minimal">   </LinkButton>
-4.  **Mail-Client** einrichten (IMAP/SMTP) <LinkButton href="/tools/mail-setup/" variant="minimal">  =>  *Email-Setup* </LinkButton>
-5.  **Wichtige Links** in Lesezeichen speichern → [/tools/](/tools/)
-</Steps>
+## 👋 Herzlich Willkommen im Team!
+
+Schön, dass du da bist! Wir freuen uns, dich bei **K.I.T. Solutions** begrüßen zu dürfen.
+
+Dieser Guide hilft dir, **in den ersten Tagen und Wochen durchzustarten**. Nimm dir Zeit, alles in Ruhe durchzugehen – es ist völlig okay, Fragen zu stellen! 💬
+
+<Aside type="tip" title="Dein Ansprechpartner">
+**Phu (Joshua)** ist dein direkter Ansprechpartner für alle Fragen:
+📧 [joshua@kit-it-koblenz.de](mailto:joshua@kit-it-koblenz.de)
+💬 Discord: `@phu` im **#general** Channel
+</Aside>
+
+---
+
+## 🎯 Was dich bei K.I.T. erwartet
+
+### **Unsere Arbeitsweise:**
+- 🏠 **Remote-First** – Arbeite von wo du willst (mit gelegentlichen Meetings)
+- 💬 **Asynchrone Kommunikation** – Discord & E-Mail statt ständige Calls
+- 🔧 **Hands-On** – Wir lernen durch Machen, nicht durch Theorie
+- 🤝 **Flache Hierarchien** – Deine Meinung zählt, egal wie lange du dabei bist
+- 🚀 **Continuous Learning** – IT steht nie still, wir auch nicht
+
+### **Was uns wichtig ist:**
+- ✅ **Eigenverantwortung** – Du organisierst deine Arbeit selbst
+- ✅ **Transparenz** – Teile Fortschritte & Probleme offen im Team
+- ✅ **Qualität > Geschwindigkeit** – Lieber richtig als schnell
+- ✅ **Security First** – Sicherheit ist kein Afterthought
+- ✅ **Clean Code** – "IT muss nicht schmutzig sein" ist nicht nur ein Motto
+
+---
+
+## 📅 Deine ersten Tage – Timeline
+
+### **🚀 Tag 1: Setup & Zugang**
+
+<CardGrid>
+  <Card title="1️⃣ E-Mail aktivieren" icon="email">
+    **Zugriff:** [mail.kit-it-koblenz.de](https://mail.kit-it-koblenz.de)
+
+    Login mit deinen initialen Credentials (hast du per E-Mail erhalten)
+
+    → **[Webmail-Guide](/tools/webmail/)**
+  </Card>
+
+  <Card title="2️⃣ Passwort & 2FA" icon="setting">
+    **WICHTIG:** Generiertes Passwort sofort ändern!
+
+    2FA mit TOTP-App aktivieren (Aegis, Authenticator)
+
+    → **[Security-Guide](/onboarding/access/)**
+  </Card>
+
+  <Card title="3️⃣ Discord beitreten" icon="discord">
+    **Team-Chat:** [discord.gg/wPe98Kru3C](https://discord.gg/wPe98Kru3C)
+
+    Stelle dich im `#general` vor! 👋
+
+    → **[Discord-Guide](/tools/discord/)**
+  </Card>
+
+  <Card title="4️⃣ Mail-Client" icon="laptop">
+    **Optional aber empfohlen:** Thunderbird, Outlook, Apple Mail
+
+    IMAP/SMTP einrichten für Desktop-Zugriff
+
+    → **[Mail-Setup-Guide](/tools/mail-setup/)**
+  </Card>
+</CardGrid>
+
+**Zeit:** ~30–60 Minuten | **Ziel:** Du bist erreichbar & abgesichert ✅
+
+---
+
+### **📚 Woche 1: Orientierung & Tools**
+
+**Tag 2-3: System-Zugriffe**
+- 🔑 **SSH-Keys generieren** – Für Server-Zugriff ([SSH-Guide](/nerdy/ssh/))
+- 🖥️ **Server-Accounts** – Phu richtet dir Zugriffe ein
+- 🐳 **Docker, Git, CLI-Tools** – Installiere dein Dev-Setup ([CLI-Snippets](/nerdy/cli/))
+
+**Tag 4-5: Projekt-Einarbeitung**
+- 📖 **Aktuelle Projekte kennenlernen** – Phu gibt dir einen Überblick
+- 🗂️ **Repositories klonen** – GitHub-Zugriff & erste Code-Reviews
+- 🎯 **Erste kleine Tasks** – Zum Warmwerden (keine Pressure!)
+
+**Wochenende:**
+- 😌 **Entspannen!** – Du hast die erste Woche geschafft 🎉
+
+---
+
+### **🚀 Monat 1: Produktiv werden**
+
+**Woche 2-4:**
+- 💼 **Eigene Verantwortungsbereiche** – Du übernimmst erste Projekte
+- 🤝 **Client-Kontakt** (falls relevant) – Mit Phu zusammen
+- 📊 **Erste Deployments** – Mit Begleitung & Code-Reviews
+- 🧠 **Deep Dives** – Spezialisiere dich in Bereichen, die dich interessieren
+
+**Ziel nach 30 Tagen:**
+- ✅ Du kennst unsere Systeme & Prozesse
+- ✅ Du arbeitest eigenständig an Projekten
+- ✅ Du weißt, wen du bei Fragen fragst
+- ✅ Du fühlst dich als Teil des Teams 💪
+
+---
+
+## ✅ Onboarding-Checkliste
+
+### **Tag 1 – Accounts & Sicherheit**
+- [ ] Webmail-Zugriff getestet ([mail.kit-it-koblenz.de](https://mail.kit-it-koblenz.de))
+- [ ] Passwort geändert (min. 16 Zeichen, Passwort-Manager!)
+- [ ] 2FA aktiviert (TOTP-App installiert & konfiguriert)
+- [ ] Discord beigetreten & vorgestellt
+- [ ] Mail-Client eingerichtet (optional)
+
+### **Woche 1 – Tools & Zugriffe**
+- [ ] SSH-Keys generiert (`ssh-keygen -t ed25519`)
+- [ ] Public Key an Phu geschickt
+- [ ] Server-Zugriff getestet (`ssh server.kit-it-koblenz.de`)
+- [ ] Git konfiguriert (`git config --global user.name/email`)
+- [ ] Repositories geklont & eingerichtet
+- [ ] Docker installiert & getestet
+- [ ] Wiki durchgelesen (zumindest die wichtigsten Seiten)
+
+### **Monat 1 – Integration**
+- [ ] Erste Pull Requests erstellt
+- [ ] An Team-Meetings teilgenommen
+- [ ] Mindestens 1 Projekt eigenständig bearbeitet
+- [ ] Feedback-Gespräch mit Phu geführt
+
+---
+
+## 🛠️ Wichtige Tools & Ressourcen
+
+<CardGrid stagger>
+  <LinkCard
+    title="📧 Webmail"
+    href="/tools/webmail/"
+    description="Zugriff auf deine K.I.T.-E-Mails im Browser"
+  />
+  <LinkCard
+    title="💬 Discord"
+    href="/tools/discord/"
+    description="Team-Chat, Support & schnelle Hilfe"
+  />
+  <LinkCard
+    title="🔐 Zugänge & 2FA"
+    href="/onboarding/access/"
+    description="Passwörter, 2FA-Setup, Security-Best-Practices"
+  />
+  <LinkCard
+    title="🤓 CLI-Snippets"
+    href="/nerdy/cli/"
+    description="Docker, Git, systemctl – alle wichtigen Commands"
+  />
+  <LinkCard
+    title="🔑 SSH-Guide"
+    href="/nerdy/ssh/"
+    description="SSH-Keys erstellen, Config, Server-Zugriff"
+  />
+  <LinkCard
+    title="🐛 Troubleshooting"
+    href="/troubleshooting/faq/"
+    description="15 häufige Probleme mit schnellen Lösungen"
+  />
+</CardGrid>
+
+---
+
+## 📞 Wichtige Kontakte
+
+### **Bei Fragen & Problemen:**
+
+| Was? | Wo? | Wann? |
+|------|-----|-------|
+| **Allgemeine Fragen** | Discord `#general` | Jederzeit |
+| **Tech-Support** | Discord `#support` | Werktags 9-18 Uhr |
+| **Dringende Probleme** | [joshua@kit-it-koblenz.de](mailto:joshua@kit-it-koblenz.de) | Werktags |
+| **Server down / Critical** | Discord DM an `@phu` | 24/7 |
+
+<Aside type="note">
+**Keine dummen Fragen!** Jeder hat mal angefangen. Frag lieber einmal zu viel als zu wenig! 💬
+</Aside>
+
+---
+
+## 💻 Hardware & Software
+
+### **Was du brauchst:**
+
+**Hardware:**
+- 💻 **Laptop** – Bring deinen eigenen mit oder wir stellen einen (nach Absprache)
+- 🎧 **Headset** – Für Calls & Meetings
+- 📱 **Smartphone** – Für 2FA & Discord-Notifications
+
+**Software (gratis für dich):**
+- 🔑 **Bitwarden/1Password** – Passwort-Manager (Team-Lizenz auf Anfrage)
+- 💬 **Discord** – Desktop-App empfohlen
+- 📧 **Thunderbird/Outlook** – Mail-Client deiner Wahl
+- 🐳 **Docker Desktop** – Für Containerized Development
+- 💻 **VS Code / JetBrains** – IDE nach Wahl
+- 🔧 **git, ssh, curl** – Standard-CLI-Tools
+
+**Cloud-Zugriffe:**
+- ☁️ **GitHub** – Für Code-Repositories
+- 🌐 **Cloudflare** – Für DNS, Pages, Zero Trust (kommt)
+- 📊 **Monitoring-Tools** – Je nach Projekt
+
+---
+
+## 🎓 Lern-Ressourcen
+
+### **Empfohlene Lektüre (nach Priorität):**
+
+1. **[Übersicht](/docs/)** – Was macht K.I.T., wer sind wir?
+2. **[Zugänge & 2FA](/onboarding/access/)** – Sicherheit zuerst!
+3. **[CLI-Snippets](/nerdy/cli/)** – Tägliches Werkzeug
+4. **[SSH-Guide](/nerdy/ssh/)** – Für Server-Arbeit
+5. **[Troubleshooting](/troubleshooting/faq/)** – Selbsthilfe bei Problemen
+6. **[Cheatsheets](/cheatsheets/abkuerzungen/)** – Quick Reference
+
+### **Externe Ressourcen:**
+- 📖 **[Astro Docs](https://docs.astro.build)** – Falls du am Wiki mitarbeitest
+- 🐳 **[Docker Docs](https://docs.docker.com)** – Container-Basics
+- 🔐 **[OWASP Top 10](https://owasp.org/www-project-top-ten/)** – Security-Awareness
+
+---
+
+## 🚀 Let's Go!
+
+Du hast alle Infos – jetzt geht's los! **Arbeite die Tag-1-Checkliste durch** und melde dich, wenn du irgendwo hängst.
+
+**Willkommen im Team! Wir freuen uns auf die Zusammenarbeit.** 🎉
+
+---
+
+<small>
+💡 **Tipp:** Bookmark diese Seite – du wirst sie in den ersten Wochen öfter brauchen!
+</small>
