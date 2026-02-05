@@ -20,9 +20,7 @@ import { Steps, Aside, Code, Tabs, TabItem } from '@astrojs/starlight/components
 - ✅ Kleiner (nur ~68 Zeichen Public Key vs. 544 bei RSA)
 - ✅ Schneller
 
-<Steps>
-
-1. **Key generieren**
+**Schritt 1: Key generieren**
 
 ```bash
 ssh-keygen -t ed25519 -C "your.email@kit-it-koblenz.de"
@@ -35,7 +33,7 @@ Enter file in which to save the key (/home/user/.ssh/id_ed25519):
 ```
 → **Enter** drücken (Standard-Pfad nutzen)
 
-2. **Passphrase setzen** (WICHTIG!)
+**Schritt 2: Passphrase setzen (WICHTIG!)**
 
 ```
 Enter passphrase (empty for no passphrase):
@@ -47,7 +45,7 @@ Enter passphrase (empty for no passphrase):
 Mit Passphrase + `ssh-agent` musst du sie nur 1x pro Boot eingeben.
 </Aside>
 
-3. **Key-Dateien checken**
+**Schritt 3: Key-Dateien checken**
 
 ```bash
 ls -l ~/.ssh/
@@ -56,8 +54,6 @@ ls -l ~/.ssh/
 Du solltest sehen:
 - `id_ed25519` → **Private Key** (GEHEIM! Nie teilen!)
 - `id_ed25519.pub` → **Public Key** (kannst du überall hinzufügen)
-
-</Steps>
 
 ---
 
@@ -216,16 +212,14 @@ So erlaubst du SSH-Zugriff **für bestimmte Public Keys** auf deinem Server.
 
 ### 📂 **Public Key auf Server hinzufügen**
 
-<Steps>
-
-1. **Public Key vom Client kopieren**
+**Schritt 1: Public Key vom Client kopieren**
 
 ```bash
 cat ~/.ssh/id_ed25519.pub
 # → Kopiere die Ausgabe
 ```
 
-2. **Auf Server: Authorized Keys bearbeiten**
+**Schritt 2: Auf Server - Authorized Keys bearbeiten**
 
 ```bash
 # Auf Server einloggen (noch mit Passwort oder anderem Key)
@@ -237,7 +231,7 @@ chmod 700 ~/.ssh
 vim ~/.ssh/authorized_keys
 ```
 
-3. **Public Key einfügen**
+**Schritt 3: Public Key einfügen**
 
 → Eine Zeile pro Key:
 ```
@@ -245,15 +239,13 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGq... user1@laptop
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDh... user2@desktop
 ```
 
-4. **Permissions setzen** (WICHTIG!)
+**Schritt 4: Permissions setzen (WICHTIG!)**
 
 ```bash
 chmod 600 ~/.ssh/authorized_keys
 ```
 
 Falls Permissions falsch sind, wird SSH den Key ignorieren! 🚨
-
-</Steps>
 
 ---
 
