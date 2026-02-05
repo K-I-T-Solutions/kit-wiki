@@ -1,8 +1,481 @@
 ---
-title: SSH & Keys
-description: Kurz erklärt.
+title: SSH & Keys – Vollständiger Guide
+description: SSH-Keys erstellen, Config schreiben, Agent nutzen & Troubleshooting.
 ---
 
-- **Key-Typ**: `ed25519` bevorzugen  
-- **Passphrase** setzen, Agent nutzen (`ssh-agent`)  
-- **Authorized Keys**: nur notwendige Zugänge, regelmäßig prüfen
+import { Steps, Aside, Code, Tabs, TabItem } from '@astrojs/starlight/components';
+
+<Aside type="tip">
+**SSH-Keys > Passwörter!** Keys sind sicherer, bequemer und Voraussetzung für viele Git-Dienste (GitHub, GitLab). Einmal einrichten = nie wieder Passwort tippen! 🔑
+</Aside>
+
+---
+
+## 1. SSH-Key erstellen
+
+### 🔐 **Empfohlener Key-Typ: `ed25519`**
+
+**Warum?**
+- ✅ Moderner, sicherer als RSA
+- ✅ Kleiner (nur ~68 Zeichen Public Key vs. 544 bei RSA)
+- ✅ Schneller
+
+<Steps>
+
+1. **Key generieren**
+
+```bash
+ssh-keygen -t ed25519 -C "your.email@kit-it-koblenz.de"
+```
+
+**Ausgabe:**
+```
+Generating public/private ed25519 key pair.
+Enter file in which to save the key (/home/user/.ssh/id_ed25519):
+```
+→ **Enter** drücken (Standard-Pfad nutzen)
+
+2. **Passphrase setzen** (WICHTIG!)
+
+```
+Enter passphrase (empty for no passphrase):
+```
+→ **Sicheres Passwort eingeben** (mind. 12 Zeichen)
+
+<Aside type="caution">
+**KEINE Passphrase = unsicher!** Falls dein Laptop geklaut wird, kann jeder deinen Key nutzen.
+Mit Passphrase + `ssh-agent` musst du sie nur 1x pro Boot eingeben.
+</Aside>
+
+3. **Key-Dateien checken**
+
+```bash
+ls -l ~/.ssh/
+```
+
+Du solltest sehen:
+- `id_ed25519` → **Private Key** (GEHEIM! Nie teilen!)
+- `id_ed25519.pub` → **Public Key** (kannst du überall hinzufügen)
+
+</Steps>
+
+---
+
+### 📋 **Public Key anzeigen**
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+**Ausgabe:**
+```
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGq... your.email@kit-it-koblenz.de
+```
+
+→ Diesen Key kopierst du zu GitHub/GitLab/Servern!
+
+---
+
+## 2. SSH-Config einrichten
+
+Die `~/.ssh/config` macht dein Leben einfacher: **Shortcuts statt IP-Adressen!**
+
+### 📝 **Basis-Config**
+
+```bash
+# ~/.ssh/config erstellen/bearbeiten
+vim ~/.ssh/config
+```
+
+**Beispiel:**
+
+```ssh-config
+# K.I.T. Main Server
+Host gideon
+  HostName 10.0.10.2
+  User joshua
+  IdentityFile ~/.ssh/id_ed25519
+  Port 22
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# GitHub
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519
+  AddKeysToAgent yes
+
+# Catch-All für K.I.T.-Server
+Host 10.0.10.*
+  User joshua
+  IdentityFile ~/.ssh/id_ed25519
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
+```
+
+**Jetzt kannst du einfach schreiben:**
+```bash
+ssh gideon          # Statt: ssh -i ~/.ssh/id_ed25519 joshua@10.0.10.2
+```
+
+---
+
+### 🎯 **Nützliche Config-Optionen**
+
+| Option | Zweck | Beispiel |
+|--------|-------|----------|
+| `HostName` | Echte IP/Domain | `10.0.10.2` |
+| `User` | Username auf Remote-Host | `joshua` |
+| `Port` | SSH-Port (Standard: 22) | `2222` |
+| `IdentityFile` | Welcher Private Key? | `~/.ssh/id_work` |
+| `ServerAliveInterval` | Keep-Alive (Verbindung stirbt nicht) | `60` |
+| `AddKeysToAgent` | Key automatisch zu Agent hinzufügen | `yes` |
+| `ForwardAgent` | SSH-Agent forwarden (für Multi-Hop) | `yes` |
+| `ProxyJump` | Über anderen Host springen (Bastion) | `bastion` |
+| `LocalForward` | Port-Forwarding (lokal → remote) | `8080 localhost:80` |
+
+---
+
+### 🪜 **ProxyJump (für Bastion Hosts)**
+
+Wenn du über einen Jump-Host musst:
+
+```ssh-config
+Host bastion
+  HostName bastion.kit-it-koblenz.de
+  User jumpuser
+  IdentityFile ~/.ssh/id_bastion
+
+Host internal-server
+  HostName 192.168.1.100
+  User admin
+  ProxyJump bastion
+  IdentityFile ~/.ssh/id_ed25519
+```
+
+**Jetzt:** `ssh internal-server` → Springt automatisch über Bastion! 🎯
+
+---
+
+## 3. SSH-Agent nutzen
+
+Der SSH-Agent speichert deine **entschlüsselte Keys im RAM** → Passphrase nur 1x eingeben!
+
+### 🚀 **Agent starten & Key hinzufügen**
+
+```bash
+# Agent starten (falls noch nicht läuft)
+eval "$(ssh-agent -s)"
+
+# Key hinzufügen
+ssh-add ~/.ssh/id_ed25519
+```
+
+**Ausgabe:**
+```
+Enter passphrase for /home/user/.ssh/id_ed25519:
+Identity added: /home/user/.ssh/id_ed25519 (your.email@kit-it-koblenz.de)
+```
+
+→ **Ab jetzt: Kein Passwort mehr bis zum Neustart!**
+
+---
+
+### 🔍 **Agent-Status checken**
+
+```bash
+# Geladene Keys anzeigen
+ssh-add -l
+
+# Alle Keys aus Agent entfernen
+ssh-add -D
+```
+
+---
+
+### ⚙️ **Agent automatisch starten (Bash/Zsh)**
+
+Füge das zu `~/.bashrc` oder `~/.zshrc` hinzu:
+
+```bash
+# SSH-Agent Auto-Start
+if [ -z "$SSH_AUTH_SOCK" ]; then
+  eval "$(ssh-agent -s)" > /dev/null
+  ssh-add ~/.ssh/id_ed25519 2>/dev/null
+fi
+```
+
+→ Agent startet beim Terminal-Öffnen automatisch!
+
+---
+
+## 4. Authorized Keys (Server-Seite)
+
+So erlaubst du SSH-Zugriff **für bestimmte Public Keys** auf deinem Server.
+
+### 📂 **Public Key auf Server hinzufügen**
+
+<Steps>
+
+1. **Public Key vom Client kopieren**
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+# → Kopiere die Ausgabe
+```
+
+2. **Auf Server: Authorized Keys bearbeiten**
+
+```bash
+# Auf Server einloggen (noch mit Passwort oder anderem Key)
+ssh user@server
+
+# Authorized Keys öffnen
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+vim ~/.ssh/authorized_keys
+```
+
+3. **Public Key einfügen**
+
+→ Eine Zeile pro Key:
+```
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGq... user1@laptop
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDh... user2@desktop
+```
+
+4. **Permissions setzen** (WICHTIG!)
+
+```bash
+chmod 600 ~/.ssh/authorized_keys
+```
+
+Falls Permissions falsch sind, wird SSH den Key ignorieren! 🚨
+
+</Steps>
+
+---
+
+### 🎯 **Quick-Method: `ssh-copy-id`**
+
+Wenn du schon SSH-Zugriff hast (mit Passwort oder anderem Key):
+
+```bash
+ssh-copy-id -i ~/.ssh/id_ed25519.pub user@server
+```
+
+→ Fügt Public Key automatisch zu `authorized_keys` hinzu! ✨
+
+---
+
+## 5. Port-Forwarding (Tunnel)
+
+### 🔀 **Local Port Forwarding**
+
+**Use-Case:** Server hat Webinterface auf Port 80, aber nur für localhost → Tunnel zu deinem PC!
+
+```bash
+ssh -L 8080:localhost:80 user@server
+```
+
+→ Jetzt: `http://localhost:8080` in deinem Browser zeigt den Remote-Server!
+
+**Erklärung:**
+- `-L` = Local Forward
+- `8080` = Dein lokaler Port
+- `localhost:80` = Ziel auf dem Remote-Server
+
+---
+
+### 🔁 **Remote Port Forwarding**
+
+**Use-Case:** Du entwickelst lokal (Port 3000), willst aber Remote-Kollegen Zugriff geben.
+
+```bash
+ssh -R 8080:localhost:3000 user@server
+```
+
+→ Kollegen können jetzt `http://server:8080` aufrufen → Landet bei dir auf Port 3000!
+
+---
+
+### 🌐 **SOCKS-Proxy (Dynamic Port Forwarding)**
+
+**Use-Case:** Gesamten Traffic durch SSH-Tunnel leiten (VPN-like).
+
+```bash
+ssh -D 9050 user@server
+```
+
+→ Browser-Proxy auf `localhost:9050` setzen → Alle Requests laufen über Server!
+
+---
+
+## 6. Troubleshooting
+
+### 🐛 **Problem: „Permission denied (publickey)"**
+
+**Ursachen & Fixes:**
+
+```bash
+# 1) Key nicht im SSH-Agent?
+ssh-add ~/.ssh/id_ed25519
+ssh-add -l  # Check ob Key geladen ist
+
+# 2) Falscher Key in Config?
+ssh -i ~/.ssh/id_ed25519 user@host  # Key explizit angeben
+
+# 3) Public Key auf Server nicht richtig?
+# → Server-Login (mit Passwort/anderem Key) → Check:
+cat ~/.ssh/authorized_keys  # Ist dein Key drin?
+ls -la ~/.ssh/              # Permissions korrekt?
+# authorized_keys muss 600 sein, .ssh muss 700 sein!
+
+# 4) GitHub/GitLab: Key hinterlegt?
+ssh -T git@github.com       # Test GitHub-Verbindung
+# Sollte sagen: "Hi <username>! You've successfully authenticated..."
+```
+
+---
+
+### 🐛 **Problem: „Connection timed out" / „No route to host"**
+
+```bash
+# 1) Host erreichbar?
+ping <host>
+
+# 2) Port 22 offen?
+telnet <host> 22
+nc -zv <host> 22
+
+# 3) Firewall blockiert?
+# → Server-Admin fragen, Port freischalten
+
+# 4) VPN notwendig?
+# → Manche Hosts nur über VPN erreichbar
+```
+
+---
+
+### 🐛 **Problem: „Host key verification failed"**
+
+**Tritt auf wenn:** Server-Key hat sich geändert (Neuinstallation, Security-Warnung!)
+
+```bash
+# Alten Key entfernen
+ssh-keygen -R <hostname>
+
+# Oder: Known Hosts komplett löschen (VORSICHT!)
+rm ~/.ssh/known_hosts
+```
+
+**Security-Check:** Wenn du den Grund nicht kennst → **Admin fragen** (könnte MITM-Attack sein!)
+
+---
+
+### 🐛 **Problem: „Too many authentication failures"**
+
+**Ursache:** SSH-Agent hat zu viele Keys geladen, Server blockt nach 5 Versuchen.
+
+**Fix:**
+```bash
+# Nur bestimmten Key nutzen
+ssh -o IdentitiesOnly=yes -i ~/.ssh/id_ed25519 user@host
+
+# Oder: In ~/.ssh/config hinzufügen:
+Host *
+  IdentitiesOnly yes
+```
+
+---
+
+## 7. Best Practices & Security
+
+### ✅ **Do's**
+
+- ✅ **Ed25519 Keys nutzen** (modern, sicher, schnell)
+- ✅ **Passphrase setzen** (mind. 12 Zeichen)
+- ✅ **SSH-Agent nutzen** (Komfort + Sicherheit)
+- ✅ **Config nutzen** (`~/.ssh/config` spart Zeit)
+- ✅ **Keys regelmäßig rotieren** (alle 1-2 Jahre neu generieren)
+- ✅ **Authorized Keys aufräumen** (alte/ungenutzte Keys entfernen)
+- ✅ **Verschiedene Keys pro Kontext** (Work, Personal, GitHub, etc.)
+
+---
+
+### ❌ **Dont's**
+
+- ❌ **Private Keys NIEMALS teilen** (auch nicht per Mail/Slack!)
+- ❌ **Keys ohne Passphrase** (außer für Automation mit eingeschränkten Rechten)
+- ❌ **Private Keys in Git committen** (passiert öfter als du denkst!)
+- ❌ **Root-Login über SSH erlauben** (Server-Config: `PermitRootLogin no`)
+- ❌ **Passwort-Auth erlauben** (Server-Config: `PasswordAuthentication no`)
+- ❌ **Alte RSA-Keys mit < 2048 Bit nutzen** (unsicher!)
+
+---
+
+### 🛡️ **Server-Security Hardening**
+
+Wenn du einen SSH-Server betreibst (`/etc/ssh/sshd_config`):
+
+```bash
+# Nur Key-Auth, kein Passwort
+PasswordAuthentication no
+PubkeyAuthentication yes
+
+# Kein Root-Login
+PermitRootLogin no
+
+# Port ändern (Security by Obscurity)
+Port 2222
+
+# Nur bestimmte User erlauben
+AllowUsers joshua admin
+
+# Idle-Timeout
+ClientAliveInterval 300
+ClientAliveCountMax 2
+
+# Nach Änderungen: Service neustarten
+sudo systemctl restart sshd
+```
+
+---
+
+## 8. Cheat Sheet
+
+```bash
+# Key generieren
+ssh-keygen -t ed25519 -C "email@example.com"
+
+# Agent starten & Key hinzufügen
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+
+# Public Key anzeigen
+cat ~/.ssh/id_ed25519.pub
+
+# Public Key zu Server kopieren
+ssh-copy-id -i ~/.ssh/id_ed25519.pub user@server
+
+# SSH mit bestimmtem Key
+ssh -i ~/.ssh/id_custom user@host
+
+# Port-Forwarding
+ssh -L 8080:localhost:80 user@server       # Local
+ssh -R 8080:localhost:3000 user@server     # Remote
+ssh -D 9050 user@server                    # SOCKS-Proxy
+
+# Troubleshooting
+ssh -v user@host                            # Verbose (debug)
+ssh -vvv user@host                          # Very verbose
+ssh-keygen -R hostname                      # Known Host entfernen
+ssh -T git@github.com                       # GitHub-Connection testen
+```
+
+---
+
+<Aside type="note">
+**Mehr SSH-Tricks gesucht?** Frag im **#nerdy-things** (Discord) oder check die [SSH-Manpage](https://man.openbsd.org/ssh) 🤓
+</Aside>
