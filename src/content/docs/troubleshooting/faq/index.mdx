@@ -48,4 +48,240 @@ description: 6 häufige Probleme, kurz gelöst.
 - Richtigen **Queue/Modelltreiber** gewählt?
 - Testseite lokal drucken; wenn ok → App/Datei-Problem.
 - Netzwerkdrucker: IP erreichbar? (Ping), ggf. neu verbinden.
-  
+
+---
+
+## 7) SSH-Verbindung schlägt fehl
+
+- **Host erreichbar?** → `ping <host>` / `telnet <host> 22`
+- **Port offen?** → Standard SSH = Port 22, bei Custom-Port prüfen
+- **SSH-Key korrekt?** → `ssh -i ~/.ssh/id_ed25519 user@host`
+  - Permissions: `chmod 600 ~/.ssh/id_ed25519` (zu offen = Fehler!)
+- **Known Hosts Problem?** → `ssh-keygen -R <hostname>` (bei Host-Key-Change)
+- **Firewall/VPN?** → Manche Hosts nur über VPN erreichbar
+- **Verbose Debug:** `ssh -vvv user@host` → Logs zeigen wo's hängt
+
+```bash
+# Quick-Check SSH
+ssh -v user@host 2>&1 | grep -i "debug\|error\|denied"
+```
+
+---
+
+## 8) Git Push/Pull Probleme
+
+### **„Permission denied (publickey)"**
+- SSH-Key nicht im SSH-Agent? → `ssh-add ~/.ssh/id_ed25519`
+- Key bei GitHub/GitLab hinterlegt? → Check Settings → SSH Keys
+- Test: `ssh -T git@github.com` (sollte Begrüßung zeigen)
+
+### **„Authentication failed"** (HTTPS)
+- **Personal Access Token** statt Passwort nutzen (GitHub/GitLab)
+- Token im Credential-Store? → `git config credential.helper store`
+
+### **„Merge conflict"** / kann nicht pullen
+```bash
+git status              # Konflikte anzeigen
+git stash               # Lokale Änderungen sichern
+git pull                # Pullen
+git stash pop           # Änderungen zurückholen
+# Oder: Konflikte manuell in Files lösen, dann commit
+```
+
+### **Push rejected (non-fast-forward)**
+```bash
+git pull --rebase       # Remote-Changes einbinden
+git push                # Nochmal pushen
+```
+
+---
+
+## 9) Langsames System / Hohe CPU-Last
+
+### **Linux:**
+```bash
+top                     # Prozesse live (q = quit)
+htop                    # Übersichtlicher (installieren!)
+ps aux | sort -k 4 -r | head -10  # Top 10 nach CPU
+journalctl -xe          # System-Logs checken
+```
+- **Docker?** → `docker stats` (Container-Ressourcen)
+- **Zombie-Prozess?** → `kill -9 <PID>`
+- **Disk I/O?** → `iotop` (zeigt Disk-intensive Prozesse)
+
+### **Typische Übeltäter:**
+- Chrome/Firefox mit 100+ Tabs
+- Runaway Docker Container (Memory-Leak)
+- IDE Indexing (VS Code, IntelliJ)
+- Backup-Software läuft im Hintergrund
+
+---
+
+## 10) Docker Container starten nicht
+
+### **Port bereits belegt:**
+```bash
+# Error: "bind: address already in use"
+sudo netstat -tulpn | grep :<PORT>  # Welcher Prozess nutzt den Port?
+sudo lsof -i :<PORT>                # Alternative
+
+# Port freigeben oder Container-Port ändern:
+docker run -p 8081:80 nginx  # Nutze 8081 statt 8080
+```
+
+### **Image nicht gefunden:**
+```bash
+docker pull <image>     # Manuell pullen
+docker images           # Vorhandene Images checken
+```
+
+### **Volume/Permission-Fehler:**
+```bash
+# Error: "permission denied"
+ls -la /path/to/volume  # Wem gehört das Volume?
+sudo chown -R $USER:$USER /path/to/volume
+```
+
+### **Netzwerk-Probleme:**
+```bash
+docker network ls       # Netzwerke anzeigen
+docker network inspect <network>  # Details
+docker-compose down && docker-compose up  # Neustart
+```
+
+---
+
+## 11) Festplatte voll / Disk Space kritisch
+
+### **Schnell-Check:**
+```bash
+df -h                   # Partitionen & Nutzung
+du -sh /* | sort -h     # Größte Ordner im Root (dauert!)
+du -sh ~/Downloads ~/.cache /tmp  # Typische Speicherfresser
+```
+
+### **Was aufräumen?**
+```bash
+# 1) Docker cleanup (oft GIGABYTE frei!)
+docker system prune -a --volumes  # Alle ungenutzten Images/Volumes
+
+# 2) Paketmanager-Cache
+sudo apt clean          # Debian/Ubuntu
+sudo dnf clean all      # Fedora/RHEL
+
+# 3) Journald-Logs (systemd)
+sudo journalctl --vacuum-size=100M  # Logs auf 100MB reduzieren
+
+# 4) Alte Kernels (Ubuntu/Debian)
+sudo apt autoremove     # Entfernt alte Kernel
+
+# 5) Temp-Files
+rm -rf ~/.cache/*       # User-Cache
+sudo rm -rf /tmp/*      # System-Temp (Vorsicht!)
+```
+
+### **Große Dateien finden:**
+```bash
+# Top 20 größte Dateien im Home
+find ~ -type f -exec du -h {} + | sort -rh | head -20
+```
+
+---
+
+## 12) Port ist bereits belegt
+
+```bash
+# Error: "Address already in use" / "Port 8080 already in use"
+
+# 1) Welcher Prozess nutzt den Port?
+sudo lsof -i :8080              # Linux/macOS
+sudo netstat -tulpn | grep 8080 # Linux
+
+# 2) Prozess killen (falls unnötig)
+sudo kill <PID>          # Graceful
+sudo kill -9 <PID>       # Force-Kill
+
+# 3) Oder: Anderen Port nutzen
+# Statt Port 8080 → 8081, 3001, etc.
+```
+
+**Windows:**
+```powershell
+netstat -ano | findstr :8080    # PID finden
+taskkill /PID <PID> /F           # Prozess beenden
+```
+
+---
+
+## 13) SSL/TLS Zertifikat-Fehler im Browser
+
+### **„Deine Verbindung ist nicht privat" / NET::ERR_CERT_**
+
+**Ursachen:**
+- **Self-Signed Cert** (Dev-Umgebung) → Akzeptabel für lokale Entwicklung
+- **Abgelaufenes Zertifikat** → Administrator muss erneuern
+- **Falsche System-Zeit** → Uhrzeit checken! (siehe 2FA-Troubleshooting)
+- **Corporate Proxy/Antivirus** → Zertifikat-Chain unterbrochen
+
+**Temporäre Lösung (NUR für Dev/Testing):**
+- Chrome: Tippe `thisisunsafe` auf der Fehlerseite (kein Button, einfach tippen!)
+- Firefox: „Risiko akzeptieren" → „Ausnahme hinzufügen"
+
+**Langfristige Lösung:**
+```bash
+# Zertifikat-Details checken
+openssl s_client -connect wiki.kit-it-koblenz.de:443 -showcerts
+
+# Eigene Zertifikate (Linux)
+sudo update-ca-certificates      # Debian/Ubuntu
+sudo update-ca-trust             # RHEL/Fedora
+```
+
+---
+
+## 14) Nvidia-Treiber-Probleme (Linux)
+
+### **Schwarzer Bildschirm nach Update / Kein X-Server**
+
+```bash
+# 1) Fallback: Nouveau-Treiber (Open Source)
+sudo systemctl isolate multi-user.target  # TTY-Mode
+sudo apt remove --purge nvidia-*          # Nvidia entfernen
+sudo apt install xserver-xorg-video-nouveau
+sudo reboot
+
+# 2) Nvidia neu installieren (Ubuntu)
+sudo ubuntu-drivers autoinstall           # Automatisch
+# Oder manuell: sudo apt install nvidia-driver-535
+
+# 3) Check welcher Treiber läuft
+nvidia-smi                                # Nvidia-Tool
+lsmod | grep -i nvidia                    # Kernel-Module
+```
+
+---
+
+## 15) WiFi langsam / verbindet nicht
+
+### **Grundlagen:**
+```bash
+# Signal-Stärke checken (Linux)
+iwconfig                        # Interface + Signal
+nmcli dev wifi list             # Verfügbare Netzwerke
+
+# DNS-Test (langsame Verbindung oft DNS-Problem!)
+nslookup google.com             # Dauert > 2 Sek? DNS-Problem!
+```
+
+### **Fixes:**
+- **Anderer WLAN-Kanal** (Router Admin-Panel) → 1/6/11 (2.4GHz) nutzen
+- **5GHz statt 2.4GHz** nutzen (weniger Interferenzen)
+- **Treiber-Update** (Windows Device Manager / Linux Kernel)
+- **DNS ändern** → 1.1.1.1 oder 9.9.9.9 (temporär testen)
+- **Firewall/VPN temporär deaktivieren** (zum Test)
+
+---
+
+<aside type="note">
+**Mehr Probleme?** Schreib ins **#support** (Discord) oder mail `support@kit-it-koblenz.de` 🤝
+</aside>

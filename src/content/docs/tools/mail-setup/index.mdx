@@ -1,21 +1,464 @@
 ---
 title: E-Mail-Setup (IMAP/SMTP)
-description: Daten kurz & knapp.
+description: Mail-Client einrichten – Step by Step für Thunderbird, Outlook, Apple Mail.
 ---
 
+import { Steps, Aside, Tabs, TabItem, Badge } from '@astrojs/starlight/components';
+
+<Aside type="note">
 Daten basieren vom [Mailcow Dokument](https://docs.mailcow.email/de/client/client/)
-## Zugangsdaten
-**Username**: `<user>@kit-it-koblenz.de`
+</Aside>
 
-**Passwort**: `<PASS>`
+---
 
-**PASS** bitte mit deinem Passwort aus dem Webmail benutzen
+## 📋 Zugangsdaten (Quick Reference)
 
-| Dienst  | Verschlüseelung | Host | Port |
---------|----|------------------------|--------|
-| IMAP | STARTTLS | mail.kit-it-koblenz.de| 143 |
-| IMAPS| SSL |mail.kit-it-koblenz.de| 993|
-| POP3 | STARTTLS | mail.kit-it-koblenz.de| 110 |
-| POP3S| SSL |mail.kit-it-koblenz.de| 995|
-| SMTP | STARTTLS | mail.kit-it-koblenz.de| 587 |
-| SMTPS| SSL |mail.kit-it-koblenz.de| 465|
+**E-Mail-Adresse:** `<dein.name>@kit-it-koblenz.de`
+**Passwort:** Dein Webmail-Passwort
+**Server:** `mail.kit-it-koblenz.de`
+
+### Empfohlene Einstellungen <Badge text="Wichtig" variant="success" />
+
+| Dienst | Verschlüsselung | Host | Port |
+|--------|----------------|------|------|
+| **IMAP** <Badge text="Empfohlen" variant="tip" /> | **STARTTLS** | mail.kit-it-koblenz.de | **143** |
+| IMAPS | SSL/TLS | mail.kit-it-koblenz.de | 993 |
+| **SMTP** <Badge text="Empfohlen" variant="tip" /> | **STARTTLS** | mail.kit-it-koblenz.de | **587** |
+| SMTPS | SSL/TLS | mail.kit-it-koblenz.de | 465 |
+
+<Aside type="tip" title="IMAP vs. POP3?">
+**Nutze IMAP!** POP3 lädt Mails runter & löscht sie vom Server → Kein Sync zwischen Geräten.
+IMAP synchronisiert Ordner, Gelesen-Status, etc. über alle Geräte. ✅
+</Aside>
+
+---
+
+## 🚀 Setup-Guides nach Client
+
+<Tabs>
+
+<TabItem label="Thunderbird">
+
+### 📬 Thunderbird (Linux/Windows/macOS)
+
+**Download:** [thunderbird.net](https://www.thunderbird.net)
+
+<Steps>
+
+1. **Thunderbird öffnen** → Beim ersten Start: **"E-Mail einrichten"**
+
+   Falls schon Accounts vorhanden: **Menü** (☰) → **Einstellungen** → **Konten-Einstellungen** → **Konten-Aktionen** → **E-Mail-Konto hinzufügen**
+
+2. **Basis-Infos eingeben**
+
+   - **Ihr Name:** `Dein Name` (wird als Absender angezeigt)
+   - **E-Mail-Adresse:** `dein.name@kit-it-koblenz.de`
+   - **Passwort:** Dein Webmail-Passwort
+
+   → **Weiter**
+
+3. **Thunderbird versucht Auto-Config**
+
+   → Sollte automatisch `mail.kit-it-koblenz.de` finden! ✨
+
+   Falls nicht: **Manuell konfigurieren** klicken
+
+4. **Manuelle Konfiguration** (falls nötig)
+
+   **Posteingang (IMAP):**
+   - Server: `mail.kit-it-koblenz.de`
+   - Port: `143`
+   - Verbindungssicherheit: `STARTTLS`
+   - Authentifizierung: `Normales Passwort`
+
+   **Postausgang (SMTP):**
+   - Server: `mail.kit-it-koblenz.de`
+   - Port: `587`
+   - Verbindungssicherheit: `STARTTLS`
+   - Authentifizierung: `Normales Passwort`
+   - **Benutzername:** `dein.name@kit-it-koblenz.de` (WICHTIG: Volle E-Mail!)
+
+   → **Erneut testen** → **Fertig**
+
+5. **✅ Fertig!** Mails sollten jetzt laden.
+
+</Steps>
+
+#### 🎨 **Signatur einrichten (Thunderbird)**
+
+1. **Einstellungen** → **Konten-Einstellungen**
+2. Dein Account auswählen → Ganz unten: **Signatur**
+3. **"HTML verwenden"** aktivieren (für Formatierung)
+4. Signatur eingeben:
+
+```
+Mit freundlichen Grüßen
+Dein Name
+
+K.I.T. Solutions GmbH
+E-Mail: dein.name@kit-it-koblenz.de
+Web: kit-it-koblenz.de
+```
+
+5. **OK** → Fertig! Ab jetzt in jeder neuen Mail.
+
+</TabItem>
+
+<TabItem label="Outlook">
+
+### 📧 Outlook (Windows/macOS)
+
+<Steps>
+
+1. **Outlook öffnen** → **Datei** → **Konto hinzufügen**
+
+2. **E-Mail-Adresse eingeben**
+
+   - E-Mail: `dein.name@kit-it-koblenz.de`
+   - → **Verbinden**
+
+3. **Kontoart wählen**
+
+   Falls nicht automatisch: **IMAP** auswählen
+
+4. **Passwort eingeben**
+
+   → Dein Webmail-Passwort
+
+5. **Erweiterte Einstellungen** (falls Auto-Config fehlschlägt)
+
+   **Posteingangsserver (IMAP):**
+   - Server: `mail.kit-it-koblenz.de`
+   - Port: `993`
+   - Verschlüsselung: `SSL/TLS`
+
+   **Postausgangsserver (SMTP):**
+   - Server: `mail.kit-it-koblenz.de`
+   - Port: `587`
+   - Verschlüsselung: `STARTTLS`
+   - **Authentifizierung erforderlich:** ✅ AN
+   - Benutzername: `dein.name@kit-it-koblenz.de`
+
+   → **Weiter** → **Fertig**
+
+</Steps>
+
+#### 🎨 **Signatur einrichten (Outlook)**
+
+1. **Datei** → **Optionen** → **E-Mail** → **Signaturen**
+2. **Neu** → Name eingeben (z.B. "Standard")
+3. Signatur schreiben (Formatierung möglich)
+4. **Standard für neue Nachrichten** auswählen
+5. **OK**
+
+</TabItem>
+
+<TabItem label="Apple Mail">
+
+### 🍎 Apple Mail (macOS/iOS)
+
+#### **macOS:**
+
+<Steps>
+
+1. **Mail öffnen** → **Mail** (Menü) → **Einstellungen** → **Accounts**
+
+2. **+** (Plus) klicken → **Account hinzufügen**
+
+3. **"Anderen Mail-Account hinzufügen"** wählen
+
+4. **Infos eingeben:**
+
+   - Name: `Dein Name`
+   - E-Mail: `dein.name@kit-it-koblenz.de`
+   - Passwort: `dein-passwort`
+
+   → **Anmelden**
+
+5. **Mail versucht Auto-Config** – Falls erfolgreich: ✅ Fertig!
+
+6. **Manuelle Config** (falls nötig):
+
+   **Mail-Server (IMAP):**
+   - Server: `mail.kit-it-koblenz.de`
+   - Benutzername: `dein.name@kit-it-koblenz.de`
+   - Passwort: `dein-passwort`
+
+   **SMTP-Server:**
+   - Server: `mail.kit-it-koblenz.de:587`
+   - Benutzername: `dein.name@kit-it-koblenz.de`
+   - Authentifizierung: Passwort
+
+   → **Anmelden**
+
+</Steps>
+
+#### **iOS (iPhone/iPad):**
+
+<Steps>
+
+1. **Einstellungen** → **Mail** → **Accounts** → **Account hinzufügen**
+
+2. **"Andere"** wählen → **Mail-Account hinzufügen**
+
+3. **Infos eingeben:**
+
+   - Name: `Dein Name`
+   - E-Mail: `dein.name@kit-it-koblenz.de`
+   - Passwort: `dein-passwort`
+   - Beschreibung: `K.I.T. Mail`
+
+   → **Weiter**
+
+4. **IMAP** auswählen (nicht POP!)
+
+5. **Server-Details:**
+
+   **Posteingang:**
+   - Hostname: `mail.kit-it-koblenz.de`
+   - Benutzername: `dein.name@kit-it-koblenz.de`
+   - Passwort: `dein-passwort`
+
+   **Postausgang:** (gleiche Daten)
+   - Hostname: `mail.kit-it-koblenz.de`
+   - Benutzername: `dein.name@kit-it-koblenz.de`
+   - Passwort: `dein-passwort`
+
+   → **Weiter** → **Sichern**
+
+</Steps>
+
+#### 🎨 **Signatur (macOS)**
+
+1. **Mail** → **Einstellungen** → **Signaturen**
+2. Account auswählen → **+** klicken
+3. Signatur eingeben
+4. **"Signatur immer verwenden"** aktivieren
+
+</TabItem>
+
+<TabItem label="Android">
+
+### 🤖 Android (Gmail App / K-9 Mail)
+
+#### **Option 1: Gmail App** (empfohlen)
+
+<Steps>
+
+1. **Gmail App** öffnen → **Menü** (☰) → **Einstellungen**
+
+2. **Konto hinzufügen** → **Andere**
+
+3. **E-Mail eingeben:** `dein.name@kit-it-koblenz.de` → **Weiter**
+
+4. **Kontotyp:** **Persönlich (IMAP)** auswählen
+
+5. **Passwort eingeben** → **Weiter**
+
+6. **Posteingangsserver:**
+
+   - Benutzername: `dein.name@kit-it-koblenz.de`
+   - Passwort: `dein-passwort`
+   - Server: `mail.kit-it-koblenz.de`
+   - Port: `993`
+   - Sicherheitstyp: `SSL/TLS`
+
+   → **Weiter**
+
+7. **Postausgangsserver:**
+
+   - Server: `mail.kit-it-koblenz.de`
+   - Port: `587`
+   - Sicherheitstyp: `STARTTLS`
+   - Anmeldung erforderlich: ✅
+   - Benutzername: `dein.name@kit-it-koblenz.de`
+
+   → **Weiter** → **Fertig**
+
+</Steps>
+
+#### **Option 2: K-9 Mail** (Open Source)
+
+**Download:** [F-Droid](https://f-droid.org/packages/com.fsck.k9/) oder Play Store
+
+→ Setup ähnlich wie Gmail App, aber mit mehr Einstellungen.
+
+</TabItem>
+
+</Tabs>
+
+---
+
+## 🐛 Häufige Probleme & Lösungen
+
+### **Problem 1: „Authentifizierung fehlgeschlagen"**
+
+**Ursachen:**
+- ❌ **Falsches Passwort** → Im Webmail testen: [mail.kit-it-koblenz.de](https://mail.kit-it-koblenz.de)
+- ❌ **Benutzername falsch** → Muss **volle E-Mail-Adresse** sein: `name@kit-it-koblenz.de`
+- ❌ **2FA aktiviert?** → Nutze **App-Passwort** statt normales Passwort (siehe Webmail-Einstellungen)
+
+**Fix:**
+```bash
+# Passwort testen (Linux/macOS)
+curl --url 'imaps://mail.kit-it-koblenz.de' --user 'name@kit-it-koblenz.de:PASS'
+# Sollte Ordner-Liste zeigen
+```
+
+---
+
+### **Problem 2: „Verbindung zum Server fehlgeschlagen"**
+
+**Ursachen:**
+- ❌ **Falscher Server** → Muss `mail.kit-it-koblenz.de` sein (nicht `imap.kit...`)
+- ❌ **Falscher Port** → IMAP: 143 (STARTTLS) oder 993 (SSL) / SMTP: 587 (STARTTLS) oder 465 (SSL)
+- ❌ **Firewall/VPN blockiert** → Teste von anderem Netzwerk (Mobil-Hotspot)
+
+**Test:**
+```bash
+# IMAP-Port testen
+telnet mail.kit-it-koblenz.de 993
+
+# SMTP-Port testen
+telnet mail.kit-it-koblenz.de 587
+```
+
+Falls Verbindung fehlschlägt → Firewall/Admin kontaktieren.
+
+---
+
+### **Problem 3: „Kann Mails empfangen, aber nicht senden"**
+
+**Ursache:** SMTP-Server nicht richtig konfiguriert.
+
+**Checklist:**
+- ✓ SMTP-Server: `mail.kit-it-koblenz.de`
+- ✓ Port: `587` (STARTTLS) oder `465` (SSL)
+- ✓ **Authentifizierung aktiviert** (oft vergessen!)
+- ✓ Benutzername = **volle E-Mail-Adresse**
+
+---
+
+### **Problem 4: Mails landen im Spam**
+
+**Für Empfänger:**
+- Im Webmail: Mail als **"Kein Spam"** markieren
+- Absender zu **Kontakten** hinzufügen
+
+**Für Absender (wenn DEINE Mails im Spam landen):**
+- → Admin kontaktieren: SPF/DKIM-Setup prüfen
+- Keine Spam-Wörter in Betreff nutzen ("KOSTENLOS!", "GEWINN!")
+- Signatur mit Link zu offiziellem K.I.T.-Website hilft
+
+---
+
+### **Problem 5: Alte Mails werden nicht angezeigt**
+
+**Ursache:** Client lädt standardmäßig nur letzte 30 Tage.
+
+**Thunderbird-Fix:**
+1. **Konten-Einstellungen** → **Synchronisation & Speicherplatz**
+2. **"Nachrichten von Server abrufen"** → **"Alle Nachrichten"** wählen
+
+**Outlook-Fix:**
+1. **Datei** → **Kontoeinstellungen** → **Doppelklick auf Account**
+2. **Weitere Einstellungen** → **Erweitert**
+3. **"Ordner offline verfügbar machen"** aktivieren
+
+---
+
+## 🎨 Signatur-Vorlagen
+
+### **Minimalistisch:**
+```
+Mit freundlichen Grüßen
+Max Mustermann
+
+K.I.T. Solutions
+max.mustermann@kit-it-koblenz.de
+```
+
+### **Professionell:**
+```
+──────────────────────────
+Max Mustermann
+IT-Consultant
+
+K.I.T. Solutions GmbH
+📧 max.mustermann@kit-it-koblenz.de
+🌐 kit-it-koblenz.de
+📞 +49 123 456789
+──────────────────────────
+```
+
+### **Mit Disclaimer:**
+```
+Mit freundlichen Grüßen
+Max Mustermann
+
+──────────────────────────
+K.I.T. Solutions GmbH
+E-Mail: max.mustermann@kit-it-koblenz.de
+Web: kit-it-koblenz.de
+
+Diese E-Mail ist nur für den Empfänger bestimmt.
+Vertrauliche Informationen nicht weitergeben.
+──────────────────────────
+```
+
+---
+
+## 🔧 Erweiterte Features
+
+### **Filter/Regeln erstellen (Thunderbird)**
+
+**Use-Case:** Automatisch Mails von bestimmten Absendern in Ordner verschieben.
+
+<Steps>
+
+1. **Rechtsklick auf Account** → **Einstellungen**
+2. **Filter** → **Neu**
+3. Regel definieren:
+   - **Von:** `enthält` → `github.com`
+   - **Aktion:** Verschieben nach → `Ordner: GitHub`
+4. **OK** → Filter aktiv!
+
+</Steps>
+
+---
+
+### **Abwesenheitsnotiz (Webmail)**
+
+1. Login: [mail.kit-it-koblenz.de](https://mail.kit-it-koblenz.de)
+2. **Einstellungen** → **Filter** → **Abwesenheit**
+3. **Aktivieren** → Nachricht schreiben:
+
+```
+Vielen Dank für Ihre Nachricht.
+
+Ich bin vom 01.01. bis 14.01. im Urlaub und
+habe keinen Zugriff auf E-Mails.
+
+In dringenden Fällen wenden Sie sich bitte an:
+support@kit-it-koblenz.de
+
+Mit freundlichen Grüßen
+Max Mustermann
+```
+
+4. **Speichern** → Fertig!
+
+---
+
+## 📚 Weiterführende Links
+
+- 🌐 **Webmail-Login:** [mail.kit-it-koblenz.de](https://mail.kit-it-koblenz.de)
+- 📖 **Mailcow Docs:** [docs.mailcow.email](https://docs.mailcow.email/de/client/client/)
+- 🔧 **Troubleshooting:** [FAQ →](/troubleshooting/faq/)
+- 🔐 **2FA-Setup:** [Zugänge & Sicherheit →](/onboarding/access/)
+
+---
+
+<Aside type="note">
+**Immer noch Probleme?** Schreib ins **#support** (Discord) oder mail `support@kit-it-koblenz.de` 📧
+</Aside>

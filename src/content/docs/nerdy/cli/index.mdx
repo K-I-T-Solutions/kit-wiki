@@ -1,31 +1,445 @@
 ---
 title: CLI & Snippets
-description: Kurze Befehle für Alltag.
+description: Die besten Terminal-Commands für den Alltag.
 ---
 
-#### Netzwerk schnell checken
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+<Aside type="tip">
+**Pro-Tipp:** Kopiere häufig genutzte Commands in deine `~/.bashrc` oder `~/.zshrc` als Aliases! 🚀
+</Aside>
+
+---
+
+## 🌐 Netzwerk schnell checken
 
 ```bash
-ip a            # IPs anzeigen
-ip r            # Routen
-nslookup host.tld
-dig +short mx kit-it-koblenz.de
+# IPs & Interfaces
+ip a                              # Alle IPs anzeigen
+ip r                              # Routing-Tabelle
+ip link show                      # Netzwerk-Interfaces
+
+# DNS-Checks
+nslookup google.com               # DNS-Lookup
+dig +short mx kit-it-koblenz.de  # MX-Records
+dig @1.1.1.1 google.com           # Mit spezifischem DNS
+
+# Connectivity
+ping -c 4 google.com              # 4 Pakete senden
+traceroute google.com             # Route zum Host
+mtr google.com                    # Ping + Traceroute (live)
+
+# Ports & Services
+nc -zv google.com 443             # Port-Check (netcat)
+telnet smtp.gmail.com 587         # SMTP-Test
+curl -I https://google.com        # HTTP-Header fetchen
+curl -o /dev/null -s -w "%{http_code}\n" https://google.com  # Nur Status
+
+# Wer lauscht auf welchem Port?
+sudo netstat -tulpn               # Alle listening Ports
+sudo lsof -i :8080                # Wer nutzt Port 8080?
+ss -tunap                         # Moderne Alternative zu netstat
 ```
 
-#### ~/.ssh/config
+---
+
+## 🐳 Docker
 
 ```bash
+# Container Management
+docker ps                         # Laufende Container
+docker ps -a                      # Alle Container (inkl. gestoppte)
+docker logs -f <container>        # Logs live verfolgen
+docker exec -it <container> bash  # In Container springen
+docker stats                      # Ressourcen-Nutzung (live)
+
+# Images
+docker images                     # Alle Images
+docker pull nginx:latest          # Image pullen
+docker rmi <image>                # Image löschen
+docker build -t myapp:v1 .        # Image bauen
+
+# Cleanup (VORSICHT!)
+docker system prune               # Ungenutzte Ressourcen löschen
+docker system prune -a --volumes  # ALLES ungenutzte löschen (inkl. Images!)
+docker stop $(docker ps -aq)      # Alle Container stoppen
+docker rm $(docker ps -aq)        # Alle Container löschen
+
+# Docker Compose
+docker-compose up -d              # Starten (detached)
+docker-compose down               # Stoppen & löschen
+docker-compose logs -f            # Logs aller Services
+docker-compose ps                 # Status aller Services
+```
+
+---
+
+## ⚙️ Systemctl & Services (systemd)
+
+```bash
+# Service-Status
+systemctl status nginx            # Status eines Services
+systemctl is-active nginx         # Läuft der Service? (exit code)
+systemctl is-enabled nginx        # Startet beim Boot?
+
+# Service-Steuerung
+sudo systemctl start nginx        # Service starten
+sudo systemctl stop nginx         # Service stoppen
+sudo systemctl restart nginx      # Service neustarten
+sudo systemctl reload nginx       # Config neu laden (ohne Neustart)
+
+# Boot-Verhalten
+sudo systemctl enable nginx       # Beim Boot starten
+sudo systemctl disable nginx      # Nicht beim Boot starten
+
+# Alle Services
+systemctl list-units --type=service       # Alle laufenden Services
+systemctl list-unit-files --type=service  # Alle installierten Services
+
+# Failed Services finden
+systemctl --failed                # Fehlgeschlagene Services
+```
+
+---
+
+## 📋 Journalctl (System-Logs)
+
+```bash
+# Basics
+sudo journalctl                   # Alle Logs (q = quit)
+sudo journalctl -f                # Live-Logs (wie tail -f)
+sudo journalctl -n 50             # Letzte 50 Zeilen
+sudo journalctl --since "1 hour ago"  # Logs der letzten Stunde
+
+# Service-spezifisch
+sudo journalctl -u nginx          # Logs für nginx
+sudo journalctl -u nginx -f       # nginx-Logs live
+
+# Boot-Logs
+sudo journalctl -b                # Logs vom aktuellen Boot
+sudo journalctl -b -1             # Logs vom vorletzten Boot
+sudo journalctl --list-boots      # Alle Boots
+
+# Filtern & Suchen
+sudo journalctl -p err            # Nur Errors (emerg, alert, crit, err)
+sudo journalctl -p warning        # Warnings & Errors
+sudo journalctl | grep -i "error" # Keyword-Suche
+
+# Disk Space
+sudo journalctl --disk-usage      # Wie viel Platz nutzen Logs?
+sudo journalctl --vacuum-size=100M  # Auf 100MB reduzieren
+```
+
+---
+
+## 🖥️ Process Management
+
+```bash
+# Prozesse anzeigen
+ps aux                            # Alle Prozesse
+ps aux | grep nginx               # Bestimmten Prozess suchen
+top                               # Live-Monitor (q = quit)
+htop                              # Schöner als top (apt install htop)
+
+# Prozess killen
+kill <PID>                        # Graceful stop (SIGTERM)
+kill -9 <PID>                     # Force-Kill (SIGKILL)
+pkill nginx                       # Prozess nach Name killen
+killall nginx                     # Alle nginx-Prozesse
+
+# Background Jobs
+command &                         # Im Hintergrund starten
+jobs                              # Laufende Jobs anzeigen
+fg %1                             # Job 1 in Vordergrund holen
+bg %1                             # Job 1 im Hintergrund weiterlaufen
+nohup command &                   # Läuft weiter nach Logout
+
+# Screen/Tmux für persistente Sessions (siehe unten)
+```
+
+---
+
+## 🖼️ tmux – Terminal Multiplexer
+
+```bash
+# Session Management
+tmux                              # Neue Session starten
+tmux new -s mysession             # Session mit Name
+tmux ls                           # Alle Sessions
+tmux attach -t mysession          # An Session anhängen
+tmux kill-session -t mysession    # Session beenden
+
+# Keyboard-Shortcuts (Prefix: Ctrl+b)
+Ctrl+b  c        # Neues Fenster (Tab)
+Ctrl+b  ,        # Fenster umbenennen
+Ctrl+b  n        # Nächstes Fenster
+Ctrl+b  p        # Vorheriges Fenster
+Ctrl+b  %        # Vertical Split
+Ctrl+b  "        # Horizontal Split
+Ctrl+b  →/←/↑/↓  # Zwischen Panes wechseln
+Ctrl+b  d        # Detach (Session läuft weiter!)
+Ctrl+b  [        # Scroll-Modus (q = quit)
+
+# Config (~/.tmux.conf)
+set -g mouse on                   # Maus-Support aktivieren
+```
+
+---
+
+## 📝 vim – Basics (Überlebenswissen)
+
+```bash
+# vim öffnen
+vim file.txt                      # Datei öffnen/erstellen
+
+# Modi
+i           # Insert-Modus (Text schreiben)
+Esc         # Normal-Modus (Befehle eingeben)
+v           # Visual-Modus (Text markieren)
+
+# Navigation (Normal-Modus)
+h j k l     # ←↓↑→ (alternativ: Pfeiltasten)
+gg          # Zum Anfang der Datei
+G           # Zum Ende der Datei
+:42         # Zu Zeile 42 springen
+/search     # Vorwärts suchen (n = nächstes)
+?search     # Rückwärts suchen
+
+# Bearbeiten
+dd          # Zeile löschen
+yy          # Zeile kopieren (yank)
+p           # Einfügen (paste)
+u           # Undo
+Ctrl+r      # Redo
+x           # Zeichen löschen
+
+# Speichern & Beenden
+:w          # Speichern (write)
+:q          # Beenden (quit)
+:wq         # Speichern & Beenden
+:q!         # Beenden ohne Speichern (force)
+ZZ          # Speichern & Beenden (Shortcut)
+```
+
+---
+
+## 🔗 Git – Advanced
+
+```bash
+# Aliases in ~/.gitconfig
+[alias]
+    st = status -sb
+    co = checkout
+    cm = commit -m
+    br = branch
+    lg = log --oneline --graph --all --decorate
+    unstage = reset HEAD --
+    amend = commit --amend --no-edit
+
+# Nützliche Commands
+git status -sb                    # Kurze Status-Übersicht
+git log --oneline --graph         # Schöner Commit-Graph
+git diff --cached                 # Staged-Changes anzeigen
+git show HEAD~2                   # 2. letzten Commit anzeigen
+
+# Branches
+git branch -a                     # Alle Branches (inkl. remote)
+git branch -d old-feature         # Branch löschen (lokal)
+git push origin --delete old-feature  # Branch löschen (remote)
+git checkout -b new-feature       # Neuen Branch erstellen & wechseln
+
+# Stashing (Änderungen zwischenspeichern)
+git stash                         # Änderungen weglegen
+git stash list                    # Alle Stashes anzeigen
+git stash pop                     # Stash zurückholen (& löschen)
+git stash apply                   # Stash zurückholen (behalten)
+
+# Reset & Revert (VORSICHT!)
+git reset --soft HEAD~1           # Letzten Commit rückgängig (Änderungen bleiben staged)
+git reset --hard HEAD~1           # Letzten Commit löschen (ALLE Änderungen weg!)
+git revert <commit>               # Commit rückgängig (neuer Commit)
+
+# Remote Management
+git remote -v                     # Remote-URLs anzeigen
+git remote add upstream <url>     # Upstream-Remote hinzufügen
+git fetch upstream                # Von Upstream fetchen
+git pull --rebase                 # Pull mit Rebase (sauberer History)
+
+# Cleanup
+git gc --aggressive --prune=now   # Repo aufräumen (Disk Space sparen)
+```
+
+---
+
+## 📂 File Operations
+
+```bash
+# Disk Usage
+df -h                             # Disk Space pro Partition
+du -sh *                          # Ordner-Größe im aktuellen Verzeichnis
+du -ah ~ | sort -rh | head -20    # Top 20 größte Dateien im Home
+ncdu                              # Interaktiver Disk-Usage-Explorer (apt install ncdu)
+
+# Find Files
+find ~ -name "*.log"              # Nach Dateinamen suchen
+find /var/log -size +100M         # Dateien größer als 100MB
+find . -type f -mtime -7          # Geändert in letzten 7 Tagen
+locate filename                   # Schnelle Dateisuche (updatedb vorher!)
+
+# Permissions
+chmod 755 script.sh               # Executable machen
+chmod 600 ~/.ssh/id_ed25519       # Nur Owner read/write
+chown user:group file             # Owner ändern
+sudo chown -R $USER:$USER /opt/myapp  # Rekursiv
+
+# Archives
+tar -czf backup.tar.gz /data      # Ordner komprimieren
+tar -xzf backup.tar.gz            # Entpacken
+zip -r backup.zip /data           # ZIP erstellen
+unzip backup.zip                  # ZIP entpacken
+
+# Sync & Backup
+rsync -avz /source/ /dest/        # Ordner synchronisieren (lokal)
+rsync -avz -e ssh /local/ user@host:/remote/  # Über SSH
+```
+
+---
+
+## 🔐 SSH & Keys
+
+```bash
+# SSH-Config (~/.ssh/config)
 Host gideon
   HostName 10.0.10.2
   User joshua
   IdentityFile ~/.ssh/id_ed25519
+  Port 22
+  ServerAliveInterval 60
+
+# SSH-Key generieren
+ssh-keygen -t ed25519 -C "your.email@kit-it-koblenz.de"
+
+# SSH-Agent
+eval "$(ssh-agent -s)"            # Agent starten
+ssh-add ~/.ssh/id_ed25519         # Key hinzufügen
+ssh-add -l                        # Geladene Keys anzeigen
+
+# SSH-Tricks
+ssh user@host 'command'           # Remote-Command ausführen
+ssh -L 8080:localhost:80 user@host  # Port-Forwarding (Local)
+ssh -R 8080:localhost:80 user@host  # Port-Forwarding (Remote)
+scp file.txt user@host:/path/     # Datei kopieren (SCP)
 ```
 
-#### Git-Commands
+**Mehr Details:** [SSH & Keys Guide →](/nerdy/ssh/)
 
-``` bash
-git st   # alias für status
-git co   # checkout/switch
-git cm   # commit -m "msg"
+---
 
+## 📊 Monitoring
+
+```bash
+# System-Übersicht
+uptime                            # System-Laufzeit & Load
+free -h                           # RAM-Nutzung
+df -h                             # Disk Space
+lscpu                             # CPU-Info
+lsblk                             # Block-Devices (Festplatten)
+
+# Live-Monitoring
+htop                              # Besseres top
+iotop                             # Disk I/O (sudo apt install iotop)
+nethogs                           # Netzwerk-Traffic pro Prozess
+glances                           # All-in-One Monitor (apt install glances)
+
+# Hardware-Info
+lspci                             # PCI-Geräte (z.B. Grafikkarte)
+lsusb                             # USB-Geräte
+dmesg | tail                      # Kernel-Messages (Hardware-Logs)
+sensors                           # Temperaturen (lm-sensors installieren)
 ```
+
+---
+
+## 🎯 Bash-Tricks
+
+```bash
+# History
+!!                                # Letzten Befehl wiederholen
+sudo !!                           # Letzten Befehl mit sudo
+!grep                             # Letzten grep-Befehl
+Ctrl+r                            # History durchsuchen (interaktiv)
+
+# Pipes & Redirects
+command | tee output.txt          # Stdout -> File & Terminal
+command > file.txt 2>&1           # Stdout + Stderr -> File
+command 2>/dev/null               # Stderr unterdrücken
+
+# Loops
+for i in {1..10}; do echo $i; done
+while true; do date; sleep 1; done
+
+# Aliases in ~/.bashrc
+alias ll='ls -lah'
+alias ..='cd ..'
+alias gs='git status -sb'
+alias dc='docker-compose'
+alias k='kubectl'
+
+# Functions in ~/.bashrc
+mkcd() { mkdir -p "$1" && cd "$1"; }  # Ordner erstellen & reinwechseln
+extract() {  # Universeller Entpacker
+  if [ -f $1 ]; then
+    case $1 in
+      *.tar.gz)  tar xzf $1   ;;
+      *.zip)     unzip $1     ;;
+      *.rar)     unrar x $1   ;;
+    esac
+  fi
+}
+```
+
+---
+
+## 🔥 One-Liners (Magic Spells)
+
+```bash
+# Top 10 größte Ordner
+du -ah / 2>/dev/null | sort -rh | head -10
+
+# Alle TODO/FIXME-Kommentare finden
+grep -rn "TODO\|FIXME" --include="*.py" .
+
+# Dateien älter als 30 Tage löschen
+find /tmp -type f -mtime +30 -delete
+
+# CPU-Kerne zählen
+nproc
+
+# Public IP herausfinden
+curl ifconfig.me
+
+# Port-Scanner (Quick & Dirty)
+nc -zv 192.168.1.1 1-1000 2>&1 | grep succeeded
+
+# JSON formatieren
+echo '{"foo":"bar"}' | python3 -m json.tool
+
+# HTTP-Server (Quick)
+python3 -m http.server 8000       # Current Dir als Webserver
+
+# Alle Prozesse eines Users
+ps aux | grep ^$USER
+
+# Rechner in 1h herunterfahren
+sudo shutdown -h +60 "System geht in 1h runter"
+
+# SSL-Zertifikat checken
+echo | openssl s_client -connect google.com:443 2>/dev/null | openssl x509 -noout -dates
+```
+
+---
+
+<Aside type="note">
+**Mehr Commands gebraucht?** Check [tldr.sh](https://tldr.sh) für praktische Beispiele oder frag im **#nerdy-things** (Discord)! 🤓
+</Aside>
+

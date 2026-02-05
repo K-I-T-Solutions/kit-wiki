@@ -1,6 +1,213 @@
 ---
-title: Passwörter und 2FA 
-description: Du kommst hier nicht rein!
+title: Zugänge & Sicherheit
+description: Passwörter, 2FA und Account-Absicherung – Step by Step.
 ---
 
+import { Steps, Aside, Badge, Code } from '@astrojs/starlight/components';
 
+<Aside type="tip" title="Warum dieser Guide wichtig ist">
+Dein Account ist der Schlüssel zu allen K.I.T.-Systemen: Mail, Discord, VPN, Server-Zugriff. **Sichere ihn ab wie deinen Haustürschlüssel – nur digitaler.** 🔐
+</Aside>
+
+---
+
+## 1. Passwort ändern (nach erstem Login)
+
+### 🔴 **WICHTIG: Generiertes Passwort SOFORT ändern!**
+
+Nach dem ersten Webmail-Login (mit dem generierten Passwort):
+
+<Steps>
+1. Gehe zu **[mail.kit-it-koblenz.de](https://mail.kit-it-koblenz.de)**
+2. Klicke oben rechts auf **Einstellungen** (⚙️) → **Passwort**
+3. Altes Passwort eingeben → Neues Passwort (2x) → **Speichern**
+</Steps>
+
+### ✅ **So sieht ein gutes Passwort aus:**
+
+```
+❌ SCHLECHT: Passwort123, Kit2024, MeinName!
+✅ GUT:      Kaffee-Morgen-37-Wolken!
+✅ GUT:      Pizza$Laptop#92Berlin
+✅ BESSER:   [Passwort-Manager generiert]
+```
+
+**Faustregel:**
+- **Mindestens 16 Zeichen** (besser 20+)
+- **Keine Wörterbuch-Wörter** allein
+- **Mix aus 4 Wortarten**: Groß/Klein/Zahl/Sonderzeichen
+- **Einzigartig pro Dienst** (nie recyceln!)
+
+<Aside type="tip" title="🔑 Passwort-Manager empfohlen">
+**Bitwarden** (Open Source, gratis) oder **1Password** (Team-Lizenzen verfügbar)
+→ Generiert & speichert sichere Passwörter automatisch.
+</Aside>
+
+---
+
+## 2. Zwei-Faktor-Authentifizierung (2FA) aktivieren
+
+### Was ist 2FA?
+
+**2 Faktoren = 2 Schritte beim Login:**
+1. **Etwas, das du weißt** → Passwort
+2. **Etwas, das du hast** → Handy mit 6-stelligem Code
+
+**Warum?** Falls jemand dein Passwort klaut, kommt er trotzdem nicht rein. 🛡️
+
+---
+
+### 🚀 **2FA einrichten (TOTP-App)**
+
+<Steps>
+
+1. **TOTP-App installieren** (falls noch nicht vorhanden):
+
+   | App | Plattform | Link |
+   |-----|-----------|------|
+   | **Aegis** <Badge text="Empfohlen" variant="success" /> | Android | [Play Store](https://play.google.com/store/apps/details?id=com.beemdevelopment.aegis) |
+   | **Authenticator** | iOS | [App Store](https://apps.apple.com/de/app/authenticator/id766157276) |
+   | **Microsoft Authenticator** | Android/iOS | Universal |
+   | **Authy** | Android/iOS/Desktop | Multi-Device |
+
+2. **Im Webmail: 2FA aktivieren**
+   - Login → **Einstellungen** (⚙️) → **Sicherheit** → **Zwei-Faktor-Auth**
+   - Klicke auf **"TOTP aktivieren"** oder **"QR-Code anzeigen"**
+
+3. **QR-Code scannen**
+   - Öffne deine TOTP-App → **"+" / "Konto hinzufügen"**
+   - Scanne den QR-Code vom Bildschirm
+   - **Name**: `K.I.T. Mail – <dein.name>@kit-it-koblenz.de`
+
+4. **Code eingeben & bestätigen**
+   - App zeigt 6-stelligen Code (wechselt alle 30 Sek.)
+   - Code ins Webmail-Feld eingeben → **Aktivieren**
+
+5. **✅ Backup-Codes speichern!** <Badge text="KRITISCH" variant="caution" />
+   - Du bekommst 10 Backup-Codes angezeigt
+   - **Screenshot machen** oder **ausdrucken**
+   - An sicherem Ort aufbewahren (Passwort-Manager, Safe)
+
+</Steps>
+
+<Aside type="danger" title="⚠️ Handy verloren ohne Backup?">
+Falls du 2FA aktiviert hast und dein Handy verlierst **ohne Backup-Codes**:
+→ Sofort Admin kontaktieren: `support@kit-it-koblenz.de`
+→ Account-Recovery kann 24–48h dauern.
+
+**Deshalb: Backup-Codes IMMER speichern!**
+</Aside>
+
+---
+
+### 📱 **Login mit 2FA (ab jetzt)**
+
+Ab sofort beim Webmail-Login:
+
+1. **Benutzername** + **Passwort** eingeben
+2. **6-stelliger Code** aus deiner TOTP-App eingeben
+3. ✅ Fertig!
+
+**Code abgelaufen?** Kein Problem – warte 30 Sek., neuer Code erscheint.
+
+---
+
+## 3. Best Practices & Tipps
+
+### ✅ **Do's**
+
+- ✅ **Passwort-Manager nutzen** (Bitwarden, 1Password)
+- ✅ **Backup-Codes sicher speichern** (mind. 2 Kopien: digital + physisch)
+- ✅ **Verschiedene Passwörter** für verschiedene Dienste
+- ✅ **2FA überall aktivieren** (Discord, GitHub, AWS, ...)
+- ✅ **Browser-Passwort-Save?** OK, wenn Master-Passwort gesetzt
+
+### ❌ **Dont's**
+
+- ❌ **Passwörter in Plaintext** speichern (kein .txt auf Desktop!)
+- ❌ **Passwörter per Mail/Slack** teilen
+- ❌ **Gleiches Passwort recyceln** („Hab ich schon bei Amazon...")
+- ❌ **2FA-Codes screenshotten** und in Cloud ohne Verschlüsselung
+- ❌ **"12345678"** oder **"Passwort"** – seriously?
+
+---
+
+## 4. Troubleshooting
+
+### 🐛 **Problem: 2FA-Code wird nicht akzeptiert**
+
+**Häufigste Ursache: Uhrzeit falsch!**
+
+```bash
+# Linux: Zeit synchronisieren
+sudo timedatectl set-ntp true
+timedatectl status
+
+# Manuelle Sync (falls NTP nicht geht)
+sudo ntpdate pool.ntp.org
+```
+
+**Android/iOS:**
+- Einstellungen → **Datum & Uhrzeit**
+- **"Automatisch"** aktivieren (über Netzwerk)
+
+**Andere Ursachen:**
+- ✓ Richtiges Konto in TOTP-App gewählt?
+- ✓ QR-Code nochmal scannen (falls Setup kürzlich)
+- ✓ Backup-Code probieren (falls Code dauerhaft falsch)
+
+---
+
+### 🐛 **Problem: Handy verloren, kein Backup**
+
+**Sofort handeln:**
+
+1. **Support kontaktieren**: `support@kit-it-koblenz.de`
+   - Betreff: **"2FA-Reset dringend – Handy verloren"**
+   - Name + E-Mail-Adresse angeben
+   - Ausweis-Foto (zur Identifikation)
+
+2. **Temporärer Zugriff** (falls Admin verfügbar):
+   - 2FA wird temporär deaktiviert (24h)
+   - Du loggst dich ein, richtest neue 2FA ein
+   - Alte Codes werden ungültig
+
+3. **Neue 2FA einrichten** (sofort nach Zugriff)
+   - QR-Code neu scannen
+   - **Diesmal Backup-Codes speichern!** 🔐
+
+---
+
+### 🐛 **Problem: Passwort vergessen**
+
+**Option 1: Self-Service (falls aktiviert)**
+- Login-Seite → **"Passwort vergessen?"**
+- Recovery-Mail wird an Backup-Adresse gesendet
+
+**Option 2: Admin-Reset**
+- Mail an `support@kit-it-koblenz.de`
+- Betreff: **"Passwort-Reset für <deine.email>@kit-it-koblenz.de"**
+- Admin generiert neues Temp-Passwort
+- Nach Login **sofort ändern!**
+
+---
+
+## 5. Weiterführende Infos
+
+### 🔗 **Empfohlene Tools**
+
+| Tool | Zweck | Link |
+|------|-------|------|
+| **Bitwarden** | Passwort-Manager (Open Source) | [bitwarden.com](https://bitwarden.com) |
+| **Aegis** | TOTP-App (Android, Open Source) | [getaegis.app](https://getaegis.app) |
+| **Have I Been Pwned** | Check ob deine E-Mail geleakt wurde | [haveibeenpwned.com](https://haveibeenpwned.com) |
+
+### 📚 **Mehr zu Zero Trust**
+
+→ Später: [Zero Trust Guide](/onboarding/zero-trust/) (in Arbeit)
+
+---
+
+<Aside type="note">
+**Fragen?** Schreib im Discord **#support** oder mail an `support@kit-it-koblenz.de` 💬
+</Aside>
